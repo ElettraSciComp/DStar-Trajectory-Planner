@@ -1,0 +1,9 @@
+<library path="lib/libdstar_global_planner">
+    <class  name="dstar_global_planner/DStarGlobalPlanner" 
+	        type="dstar_global_planner::DStarGlobalPlanner" 
+	        base_class_type="nav_core::BaseGlobalPlanner">
+		<description>
+			ROS move_base wrapper for DStar-based global path planner
+		</description>
+	</class>
+</library>
