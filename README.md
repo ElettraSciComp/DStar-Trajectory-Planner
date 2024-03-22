@@ -5,7 +5,7 @@
 ## Overview
 
 The package contains two plugins:
-- **D* trajectory planner** that maintains generation of the global trajectory on the provided costmap, and dynamic replanning by request coming from `move_base`.
+- **D-star trajectory planner** that maintains generation of the global trajectory on the provided costmap, and dynamic replanning by request coming from `move_base`.
 - **Virtual Walls module** processing JSON objects to generate the non-passable and explicitly passable zones as OpenCV polygons added over the existing map.
 
 ## Parameters
