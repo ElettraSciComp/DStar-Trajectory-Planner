@@ -1,4 +1,4 @@
-# D* Dynamic Trajectory Planner
+# [D* Dynamic Trajectory Planner](https://wiki.ros.org/dstar_trajectory_planner)
 
 `move_base` plugin implementing global trajectory planning with [D* informed incremental search algorithm](https://citeseerx.ist.psu.edu/viewdoc/summary?doi=10.1.1.15.3683) with external optimizers. It strives to simplify development of the robotic systems operating in dense industrial environments.
 
