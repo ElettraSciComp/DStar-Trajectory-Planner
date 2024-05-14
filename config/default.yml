@@ -1,0 +1,17 @@
+map:
+    topic_name: /trajectory_controller/global_costmap/costmap
+    enable_erosion: false
+    erosion_gap: 3
+path_publisher:
+    enable: true
+    topic_name: /path
+    frame_id: map
+planner_service_name: /get_path
+pose_tracker:
+    stamped: true
+    topic_name: /tracked_pose
+obstacle_occupancy_threshold: 3
+goal_distance_threshold: 0.5
+trajectory_optimizer:
+    repulsion_gain: 50.0
+    potential_field_radius: 12 # Robot's medium size multiplied by resolution is recommended
