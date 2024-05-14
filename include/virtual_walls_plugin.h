@@ -1,14 +1,15 @@
 #ifndef VIRTUAL_WALLS_PLUGIN_H
 #define VIRTUAL_WALLS_PLUGIN_H
 
-#include <ros/ros.h>
-#include <costmap_2d/costmap_2d.h>
-#include <costmap_2d/layer.h>
-#include <costmap_2d/layered_costmap.h>
-#include <costmap_2d/GenericPluginConfig.h>
-#include <costmap_2d/static_layer.h>
-#include <geometry_msgs/Polygon.h>
-#include <geometry_msgs/Point32.h>
+#include "rclcpp/rclcpp.hpp"
+#include <nav2_costmap_2d/costmap_2d_ros.hpp>
+#include <nav2_costmap_2d/costmap_2d.hpp>
+#include <nav2_costmap_2d/layer.hpp>
+#include <nav2_costmap_2d/layered_costmap.hpp>
+// #include <nav2_costmap_2d/GenericPluginConfig.hpp>
+#include <nav2_costmap_2d/static_layer.hpp>
+#include <geometry_msgs/msg/polygon.hpp>
+#include <geometry_msgs/msg/point32.hpp>
 
 #include <string>
 #include <vector>
