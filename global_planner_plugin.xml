@@ -1,4 +1,4 @@
-<library path="libdstar_global_planner">
+<library path="dstar_global_planner_plugin">
     <class  name="dstar_global_planner/DStarGlobalPlanner" 
 	        type="dstar_global_planner::DStarGlobalPlanner" 
 	        base_class_type="nav2_core::GlobalPlanner">

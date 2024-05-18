@@ -278,36 +278,12 @@ planner_server:
     use_sim_time: True
     planner_plugins: ["GridBased"]
     GridBased:
-      plugin: "dstar_global_planner/DStarGlobalPlanner"
+      plugin: "nav2_straightline_planner/StraightLine"
       interpolation_resolution: 0.1
-      goal_distance_threshold: 0.5
-      neighbor_distance_threshold : 0.1
-      occupancy_threshold: 64 # 1254 # 64 #
-      cutoff_distance: 16
-      trajectory_optimizer:
-        repulsion_gain: 50.0
-        potential_field_radius: 12.0 # Robot's medium size multiplied by resolution is recommended
-      erosion:
-        enable: false
-        erosion_gap: 2
-      paths:
-        from: /none
-        enable: false
-      tolerance: 0.5
-      use_astar: false
-      allow_unknown: true
-#     topic_name: /trajectory_controller/global_costmap/costmap
-#     enable_erosion: false
-#     erosion_gap: 3
-# path_publisher:
-#     enable: true
-#     topic_name: /path
-#     frame_id: map
-# planner_service_name: /get_path
-# pose_tracker:
-#     stamped: true
-#     topic_name: /tracked_pose
-# obstacle_occupancy_threshold: 3
+      # plugin: "nav2_navfn_planner/NavfnPlanner"
+      # tolerance: 0.5
+      # use_astar: false
+      # allow_unknown: true
 
 smoother_server:
   ros__parameters:

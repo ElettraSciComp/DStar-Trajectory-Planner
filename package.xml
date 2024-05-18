@@ -1,5 +1,5 @@
 <package format="2">
-    <name>dstar_trajectory_planner</name>
+    <name>dstar_global_planner</name>
     <version>0.1.3</version>
     <description>
         move_base global planner plugin based on OccupancyGrid map and D-Star algorithm
@@ -26,7 +26,7 @@
     <depend>nav2_costmap_2d</depend>
     <export>
         <build_type>ament_cmake</build_type>
-        <nav2_core plugin="${prefix}/dstar_global_planner_plugin.xml" />
+        <nav2_core plugin="${prefix}/global_planner_plugin.xml" />
     </export>
 </package>
 
