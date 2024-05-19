@@ -433,10 +433,13 @@ void dstar::init_targets(const long &origin_x,
                          const long &destination_y,
                          const bool &weighted)
 {
-    if((origin_x < map->get_width()) && (origin_y < map->get_height()) &&
+    fprintf (stderr, "init target... map(%ld, %ld)\n", map->get_width(), map->get_width());
+    if((origin_x < map->get_width()) && (origin_y < map->get_width()) &&
             (destination_x < map->get_width()) && (destination_y < map->get_height()))
     {
+        fprintf (stderr, "initialization init target!\n");
         if(destination != nullptr)
+            fprintf (stderr, "Destination is not a null pointer!\n");
             reset();
         destination = map->point(destination_x, destination_y);
         destination->cost_actual = 0;
@@ -446,14 +449,17 @@ void dstar::init_targets(const long &origin_x,
         open_list.push_back(destination);
         if(origin != nullptr)
         {
+            fprintf (stderr, "Origin is not a null pointer!\n");
             origin->weight = origin->weight_previous;
         }
         origin = map->point(origin_x, origin_y);
-        for(long i = 0; i < map->get_width(); i++)
+        for(long i = 0; i < map->get_width(); i++){
+            fprintf (stderr, "filling the colum %ld!\n", i);
             for(long j = 0; j < map->get_height(); j++)
             {
                 if((map->point(i, j) != origin) && ((map->point(i, j) != destination)))
                 {
+                    // fprintf (stderr, "filling the map!\n");
                     std::pair<double, double> origin_coords = origin->float_coords();
                     std::pair<double, double> destination_coords = destination->float_coords();
                     double dist = std::sqrt(std::pow(std::abs(destination_coords.first - origin_coords.first), 2) + std::pow(std::abs(destination_coords.second - origin_coords.second), 2));
@@ -466,6 +472,7 @@ void dstar::init_targets(const long &origin_x,
                         map->point(i,j)->weight += ((l_cost_addition < 0) ? 10 : l_cost_addition);
                 }
             }
+        }
     }
 }
 
@@ -487,7 +494,9 @@ void dstar::set_r_field(int value)
 std::list<state_point *> dstar::generate_trajectory()
 {
     if((origin == nullptr) || (destination == nullptr))
+        {fprintf (stderr, "fuck!\n");
         return std::list<state_point*>();
+        }
     while(iterate_state() != -1){}
     std::cout << std::endl;
     return trace_path();
