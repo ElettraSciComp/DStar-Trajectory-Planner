@@ -48,7 +48,8 @@ private:
 
     // costmap_2d::Costmap2DROS* current_costmap;
     // costmap_2d::Costmap2D* costmap;
-    nav2_costmap_2d::Costmap2DROS* current_costmap;
+    // nav2_costmap_2d::Costmap2DROS* current_costmap;
+    std::shared_ptr<nav2_costmap_2d::Costmap2DROS> current_costmap;
     nav2_costmap_2d::Costmap2D* costmap;
 
     double goal_distance_threshold;

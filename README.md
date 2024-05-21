@@ -26,3 +26,16 @@ The plugin accepts the following parameters
 
 ## Development and Roadmap
 The plugin was developed within the Robotics and Remotization initiative held at Elettra Sincrotrone Trieste. It is a part of an innovative flexible control system for mobile robots that was presented by the group leaders in Tokyo during 16th [IFToMM](https://iftomm-world.org) [World Congress](https://wc2023.jc-iftomm.org/) 2023. The interested ones can find the published paper here: https://doi.org/10.1007/978-3-031-45770-8_29
+
+
+### Test
+
+commands for test:
+```
+. /usr/share/gazebo/setup.sh
+export TURTLEBOT3_MODEL=waffle
+export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/opt/ros/humble/share/turtlebot3_gazebo/models
+source <Dstar_path>/install/setup.bash
+clear && colcon build && ros2 launch nav2_bringup tb3_simulation_launch.py params_file:=<Dstar_path>/config/nav2_params.yaml 2>&1 | tee log1.log
+
+```

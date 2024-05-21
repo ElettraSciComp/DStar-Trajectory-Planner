@@ -454,7 +454,7 @@ void dstar::init_targets(const long &origin_x,
         }
         origin = map->point(origin_x, origin_y);
         for(long i = 0; i < map->get_width(); i++){
-            fprintf (stderr, "filling the colum %ld!\n", i);
+            // fprintf (stderr, "filling the colum %ld!\n", i);
             for(long j = 0; j < map->get_height(); j++)
             {
                 if((map->point(i, j) != origin) && ((map->point(i, j) != destination)))
