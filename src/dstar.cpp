@@ -494,7 +494,7 @@ void dstar::set_r_field(int value)
 std::list<state_point *> dstar::generate_trajectory()
 {
     if((origin == nullptr) || (destination == nullptr))
-        {fprintf (stderr, "fuck!\n");
+        {fprintf (stderr, "missing origin or destination!\n");
         return std::list<state_point*>();
         }
     while(iterate_state() != -1){}
