@@ -59,8 +59,19 @@ void DStarGlobalPlanner::configure(
         // parse_paths_json(paths_json_filename);
     }
     current_costmap = costmap_ros;
-    RCLCPP_WARN(node_->get_logger(),"getting costmap");
-    costmap = costmap_ros->getCostmap();
+    
+    //tmp fix
+    // delete state_grid;
+    // delete generator;
+
+}
+void DStarGlobalPlanner::activate(){
+  RCLCPP_INFO(node_->get_logger(), "Activating plugin %s of type NavfnPlanner", name_.c_str());
+  // generator = nullptr;
+  // state_grid = nullptr;
+  // initial_path = true;
+RCLCPP_WARN(node_->get_logger(),"getting costmap");
+    costmap = current_costmap->getCostmap();
     width = static_cast<long>(costmap->getSizeInCellsX());
     height = static_cast<long>(costmap->getSizeInCellsY());
     RCLCPP_INFO(node_->get_logger(),"Obtained map [%li, %li], %f m/pt, filling D* internal costmap...", width, height, costmap->getResolution());
@@ -105,17 +116,6 @@ void DStarGlobalPlanner::configure(
     generator->set_r_field(potential_field_radius);
     generator->set_repulsion_gain(repulsion_gain);
     
-    //tmp fix
-    // delete state_grid;
-    // delete generator;
-
-}
-void DStarGlobalPlanner::activate(){
-  RCLCPP_INFO(node_->get_logger(), "Activating plugin %s of type NavfnPlanner", name_.c_str());
-  // generator = nullptr;
-  // state_grid = nullptr;
-  // initial_path = true;
-
 }
 
 void DStarGlobalPlanner::cleanup(){
