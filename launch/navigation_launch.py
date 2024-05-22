@@ -138,9 +138,9 @@ def generate_launch_description():
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
                 remappings=remappings),
-            TimerAction(
-                period=5.0,  # Added delay to avoid resizing after get costmap
-                actions=[
+            # TimerAction(
+            #     period=30.0,  # Added delay to avoid resizing after get costmap
+            #     actions=[
             Node(
                 package='nav2_planner',
                 executable='planner_server',
@@ -150,7 +150,9 @@ def generate_launch_description():
                 respawn_delay=2.0,
                 parameters=[configured_params],
                 arguments=['--ros-args', '--log-level', log_level],
-                remappings=remappings)]),
+                remappings=remappings
+                # )]
+            ),
             Node(
                 package='nav2_behaviors',
                 executable='behavior_server',
@@ -308,7 +310,7 @@ def generate_launch_description():
     ld.add_action(declare_log_level_cmd)
     # Add the actions to launch all of the navigation nodes
     ld.add_action(load_nodes)
-    ld.add_action(load_composable_nodes)
+    # ld.add_action(load_composable_nodes)
     # ld.add_action(load_nodes2)
     # ld.add_action(load_composable_nodes2)
 
