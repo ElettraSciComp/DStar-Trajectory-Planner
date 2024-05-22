@@ -473,6 +473,8 @@ void dstar::init_targets(const long &origin_x,
                 }
             }
         }
+        fprintf (stderr, "init completed!\n");
+
     }
 }
 

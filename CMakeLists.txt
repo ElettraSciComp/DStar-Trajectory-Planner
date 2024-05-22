@@ -100,6 +100,10 @@ install(DIRECTORY include/
   DESTINATION include/
 )
 
+install(DIRECTORY launch/
+  DESTINATION share/${PROJECT_NAME}/launch
+)
+
 install(FILES global_planner_plugin.xml
   DESTINATION share/${PROJECT_NAME}
 )

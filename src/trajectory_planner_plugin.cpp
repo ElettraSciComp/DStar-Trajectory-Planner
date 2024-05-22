@@ -222,7 +222,7 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
         else
           global_path.poses[i].pose.orientation = goal.pose.orientation;
       }
-      global_path.poses.push_back(goal);
+      //global_path.poses.push_back(goal);
       return global_path;
     }
     else
@@ -294,8 +294,8 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
     for(auto i = trajectory.begin(); i != trajectory.end(); i++)
     {
       state_point* p = (*i);
-      pose.header.frame_id = current_costmap->getGlobalFrameID();
-      pose.header.stamp = rclcpp::Clock{}.now();
+      //pose.header.frame_id = current_costmap->getGlobalFrameID();
+      // pose.header.stamp = rclcpp::Clock{}.now();
       // no sequence in ros2 in header
       // pose.header.seq = i;
       costmap->mapToWorld(p->x, p->y, pose.pose.position.x, pose.pose.position.y);
@@ -320,7 +320,7 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
       }
         global_path.poses.push_back(pose);
     }
-    global_path.poses.push_back(goal);
+    //global_path.poses.push_back(goal);
     initial_path = false;
   }
   else
@@ -362,7 +362,7 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
     for(auto i = trajectory.begin(); i != trajectory.end(); i++)
     {
       state_point* p = (*i);
-      pose.header.frame_id = current_costmap->getGlobalFrameID();
+      //pose.header.frame_id = current_costmap->getGlobalFrameID();
       pose.header.stamp = rclcpp::Clock{}.now();
       // no sequence in ros2 in header
       // pose.header.seq = i;
@@ -388,7 +388,7 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
       }
       global_path.poses.push_back(pose);
     }
-    global_path.poses.push_back(goal);
+    //global_path.poses.push_back(goal);
   }
 
 return global_path;
