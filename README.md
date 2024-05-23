@@ -35,7 +35,7 @@ commands for test:
 . /usr/share/gazebo/setup.sh
 export TURTLEBOT3_MODEL=waffle
 export GAZEBO_MODEL_PATH=$GAZEBO_MODEL_PATH:/opt/ros/humble/share/turtlebot3_gazebo/models
-source <Dstar_path>/install/setup.bash
-clear && colcon build && ros2 launch nav2_bringup tb3_simulation_launch.py params_file:=<Dstar_path>/config/nav2_params.yaml 2>&1 | tee log1.log
+source install/setup.bash
+clear && colcon build && ros2 launch nav2_bringup tb3_simulation_launch.py params_file:=config/nav2_params.yaml 2>&1 | tee log1.log
 
 ```

@@ -33,6 +33,7 @@ find_package( tf2_geometry_msgs REQUIRED )
 # find_package( sensor_msgs REQUIRED )
 # find_package( move_base REQUIRED )
 
+find_package( jsoncpp REQUIRED )
 
 
 include_directories(
@@ -81,7 +82,7 @@ target_compile_definitions(dstar PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 #   "$<INSTALL_INTERFACE:include>"
 #   ${rclcpp_INCLUDE_DIRS}
 # )
-target_link_libraries(${library_name} dstar)
+target_link_libraries(${library_name} dstar jsoncpp)
 
 ament_target_dependencies(${library_name}
   ${dependencies}

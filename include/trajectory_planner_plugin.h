@@ -21,7 +21,7 @@
 #include "dstar.h"
 
 #include <boost/filesystem.hpp>
-// #include <jsoncpp/json/json.h>
+#include <jsoncpp/json/json.h>
 #include <fstream>
 
 //---------------------------
@@ -46,9 +46,6 @@ private:
     geometry_msgs::msg::PoseStamped current_destination;
     std::list<state_point*> trajectory;
 
-    // costmap_2d::Costmap2DROS* current_costmap;
-    // costmap_2d::Costmap2D* costmap;
-    // nav2_costmap_2d::Costmap2DROS* current_costmap;
     std::shared_ptr<nav2_costmap_2d::Costmap2DROS> current_costmap;
     nav2_costmap_2d::Costmap2D* costmap;
 
@@ -65,10 +62,10 @@ private:
 
     std::vector<nav_msgs::msg::Path> ready_paths;
     std::string paths_json_filename;
-    // Json::Reader json_parser;
-    // Json::Value json_paths;
+    Json::Reader json_parser;
+    Json::Value json_paths;
     bool enable_ready_paths;
-    // void parse_paths_json(const std::string& filename);
+    void parse_paths_json(const std::string& filename);
 
 public:
     // DStarGlobalPlanner();
@@ -77,20 +74,6 @@ public:
      DStarGlobalPlanner() = default;
      ~DStarGlobalPlanner() = default;
     // DStarGlobalPlanner(std::string name, nav2_costmap_2d::Costmap2DROS* costmap_ros);
-    // virtual void initialize(std::string name, nav2_costmap_2d::Costmap2DROS* costmap_ros);
-    // virtual bool makePlan(const geometry_msgs::msg::PoseStamped& start,
-    //                       const geometry_msgs::msg::PoseStamped& goal,
-    //                       std::vector< geometry_msgs::msg::PoseStamped >& plan);
-    // virtual bool makePlan(const geometry_msgs::msg::PoseStamped& start,
-    //                       const geometry_msgs::msg::PoseStamped& goal,
-    //                       std::vector< geometry_msgs::msg::PoseStamped >& plan,
-    //                       double& cost);
-
-    // virtual void configure();
-    // virtual void cleanup() = 0;
-    // virtual void activate() = 0;
-    // virtual void deactivate() = 0;
-    // virtual nav_msgs::msg::Path createPlan();
 
     // node ptr
     nav2_util::LifecycleNode::SharedPtr node_;

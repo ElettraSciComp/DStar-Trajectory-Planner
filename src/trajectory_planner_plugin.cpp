@@ -14,6 +14,74 @@ namespace dstar_global_planner
 
 using namespace libdstar;
 
+void DStarGlobalPlanner::parse_paths_json(const std::string &filename)
+{
+    if(!boost::filesystem::exists(filename))
+    {
+        RCLCPP_WARN(node_->get_logger(),"File \'%s\' seems not existing, skipping paths collection", filename.c_str());
+        return;
+    }
+    RCLCPP_INFO(node_->get_logger(),"Parsing file %s...", filename.c_str());
+    std::ifstream paths_file(filename);
+    Json::Value json_map;
+    json_parser.parse(paths_file, json_map);
+    paths_file.close();
+    if(json_map.type() != Json::ValueType::objectValue)
+    {
+        RCLCPP_ERROR(node_->get_logger(),"Cannot parse path list from the file: the root JSON object is not a dictionary!");
+        return;
+    }
+    json_paths = json_map["vpaths"];
+    if(json_paths.type() != Json::ValueType::arrayValue)
+    {
+        RCLCPP_ERROR(node_->get_logger(),"Cannot parse freepath selectors from the file: the VPATHS object is not an array (%i)!", json_paths.type());
+        return;
+    }
+    for(unsigned int i = 0; i < json_paths.size(); i++)
+    {
+        RCLCPP_INFO(node_->get_logger(),"Parsing selector %u", i);
+        Json::Value path = json_paths[i];
+        if(path.type() != Json::ValueType::objectValue)
+        {
+            RCLCPP_ERROR(node_->get_logger(),"Cannot parse path selector %u from the file: the root namespace is not an object!", i);
+            return;
+        }
+        Json::Value path_name = path["name"];
+        if(path_name.type() != Json::ValueType::stringValue)
+        {
+            RCLCPP_ERROR(node_->get_logger(),"Cannot parse path selector %u from the file:  the path selector should have a name!", i);
+            return;
+        }
+        RCLCPP_INFO(node_->get_logger(),"Parsing freepath selector %s", path_name.asString().c_str());
+        Json::Value path_polygon = path["polygon"];
+        if(path_polygon.type() != Json::ValueType::arrayValue)
+        {
+            RCLCPP_ERROR(node_->get_logger(),"Cannot parse path selector contents:  the path selector point chain should be defined as an array!");
+            return;
+        }
+        if((path_polygon.size() % 2) != 0)
+        {
+            RCLCPP_ERROR(node_->get_logger(),"Cannot parse object: the point coordinates are not pairable");
+            return;
+        }
+        nav_msgs::msg::Path new_path;
+        for(unsigned int index = 0; index < path_polygon.size(); index += 2)
+        {
+            RCLCPP_INFO(node_->get_logger(),"Parsing point %u", index / 2);
+            geometry_msgs::msg::PoseStamped point;
+            point.pose.position.x = path_polygon[index].asDouble();
+            point.pose.position.y = path_polygon[index + 1].asDouble();
+            point.pose.position.z = 0;
+            new_path.poses.push_back(point);
+        }
+        if(new_path.poses.size() >= 2)
+            ready_paths.push_back(new_path);
+        else
+            RCLCPP_WARN(node_->get_logger(),"Cannot register the freepath selector: the selector \"%s\" should contain more than one point!", path_name.asString().c_str());
+    }
+}
+
+
 void DStarGlobalPlanner::configure(
         const rclcpp_lifecycle::LifecycleNode::WeakPtr & parent,
         std::string name,
@@ -54,9 +122,10 @@ void DStarGlobalPlanner::configure(
       paths_json_filename = node_->get_parameter("paths.from").as_string();
       nav2_util::declare_parameter_if_not_declared(node_, "paths.enable", rclcpp::ParameterValue(false));
       enable_ready_paths = node_->get_parameter("paths.enable").as_bool();
-      if(enable_ready_paths)
-        RCLCPP_WARN(node_->get_logger(),"NOT IMPLEMENTED");
-        // parse_paths_json(paths_json_filename);
+      if(enable_ready_paths){
+        RCLCPP_INFO(node_->get_logger(),"parsing json");
+        parse_paths_json(paths_json_filename);
+      }
     }
     current_costmap = costmap_ros;
     
@@ -70,51 +139,51 @@ void DStarGlobalPlanner::activate(){
   // generator = nullptr;
   // state_grid = nullptr;
   // initial_path = true;
-RCLCPP_WARN(node_->get_logger(),"getting costmap");
-    costmap = current_costmap->getCostmap();
-    width = static_cast<long>(costmap->getSizeInCellsX());
-    height = static_cast<long>(costmap->getSizeInCellsY());
-    RCLCPP_INFO(node_->get_logger(),"Obtained map [%li, %li], %f m/pt, filling D* internal costmap...", width, height, costmap->getResolution());
-    if(generator)
-        delete generator;
-    if(state_grid)
-        delete state_grid;
-    state_grid = new state_map(width, height);
-    unsigned char* map_data = costmap->getCharMap();
-    // costmap->saveMap("/home/jobot/costmap_test.png");
-    for(long i = 0; i < width; i++)
-      for(long j = 0; j < height; j++)
-      {
-        unsigned long pos = (j * width) + i;
-        state_grid->point(i, j)->weight_previous = map_data[pos];
-        state_grid->point(i, j)->weight = map_data[pos];
-        state_grid->point(i, j)->cost_previous = map_data[pos];
-        state_grid->point(i, j)->cost_actual = map_data[pos];
-        if(map_data[pos] >= occupancy_threshold){
-          state_grid->point(i, j)->tag = state_point::stObstacle;
-          if(erosion){
-            for(long u = -erosion_gap; u <= erosion_gap; u++)
-              for(long v = erosion_gap; v >= -erosion_gap; v--){
-                long x_index = i + u;
-                long y_index = j + v;
-                if((x_index >= 0) &&
-                  (x_index < state_grid->get_width()) &&
-                  (y_index >= 0) &&
-                  (y_index < state_grid->get_height()) &&
-                  !((u == 0) && (v == 0)))
-                    if(state_grid->point(x_index, y_index)->tag != state_point::stObstacle)
-                      state_grid->point(x_index, y_index)->tag = state_point::stObstacle;
-              }
-          }
+  RCLCPP_WARN(node_->get_logger(),"getting costmap");
+  costmap = current_costmap->getCostmap();
+  width = static_cast<long>(costmap->getSizeInCellsX());
+  height = static_cast<long>(costmap->getSizeInCellsY());
+  RCLCPP_INFO(node_->get_logger(),"Obtained map [%li, %li], %f m/pt, filling D* internal costmap...", width, height, costmap->getResolution());
+  if(generator)
+      delete generator;
+  if(state_grid)
+      delete state_grid;
+  state_grid = new state_map(width, height);
+  unsigned char* map_data = costmap->getCharMap();
+  // costmap->saveMap("/home/jobot/costmap_test.png");
+  for(long i = 0; i < width; i++)
+    for(long j = 0; j < height; j++)
+    {
+      unsigned long pos = (j * width) + i;
+      state_grid->point(i, j)->weight_previous = map_data[pos];
+      state_grid->point(i, j)->weight = map_data[pos];
+      state_grid->point(i, j)->cost_previous = map_data[pos];
+      state_grid->point(i, j)->cost_actual = map_data[pos];
+      if(map_data[pos] >= occupancy_threshold){
+        state_grid->point(i, j)->tag = state_point::stObstacle;
+        if(erosion){
+          for(long u = -erosion_gap; u <= erosion_gap; u++)
+            for(long v = erosion_gap; v >= -erosion_gap; v--){
+              long x_index = i + u;
+              long y_index = j + v;
+              if((x_index >= 0) &&
+                (x_index < state_grid->get_width()) &&
+                (y_index >= 0) &&
+                (y_index < state_grid->get_height()) &&
+                !((u == 0) && (v == 0)))
+                  if(state_grid->point(x_index, y_index)->tag != state_point::stObstacle)
+                    state_grid->point(x_index, y_index)->tag = state_point::stObstacle;
+            }
         }
-        else
-          state_grid->point(i, j)->tag = state_point::stNew;
       }
-    RCLCPP_INFO(node_->get_logger(),"D* internal costmap filled, running algorithm");
-    generator = new dstar(state_grid);
-    generator->set_cutoff_distance(cutoff_distance);
-    generator->set_r_field(potential_field_radius);
-    generator->set_repulsion_gain(repulsion_gain);
+      else
+        state_grid->point(i, j)->tag = state_point::stNew;
+    }
+  RCLCPP_INFO(node_->get_logger(),"D* internal costmap filled, running algorithm");
+  generator = new dstar(state_grid);
+  generator->set_cutoff_distance(cutoff_distance);
+  generator->set_r_field(potential_field_radius);
+  generator->set_repulsion_gain(repulsion_gain);
     
 }
 
