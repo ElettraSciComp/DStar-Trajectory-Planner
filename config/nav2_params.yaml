@@ -274,14 +274,14 @@ map_saver:
 
 planner_server:
   ros__parameters:
-    expected_planner_frequency: 0.01
+    expected_planner_frequency: 20.0
     use_sim_time: True
     planner_plugins: ["GridBased"]
     GridBased:
       plugin: "dstar_global_planner/DStarGlobalPlanner"
       goal_distance_threshold: 0.5
       neighbor_distance_threshold : 0.1
-      occupancy_threshold: 1254 # 1254 # 64 #
+      occupancy_threshold: 256 # 1254 # 64 #
       cutoff_distance: 16
       trajectory_optimizer:
         repulsion_gain: 50.0
