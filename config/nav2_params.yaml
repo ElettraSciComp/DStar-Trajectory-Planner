@@ -281,7 +281,7 @@ planner_server:
       plugin: "dstar_global_planner/DStarGlobalPlanner"
       goal_distance_threshold: 0.5
       neighbor_distance_threshold : 0.1
-      occupancy_threshold: 256 # 1254 # 64 #
+      occupancy_threshold: 245 # 64 #
       cutoff_distance: 16
       trajectory_optimizer:
         repulsion_gain: 50.0
