@@ -208,7 +208,7 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
       RCLCPP_INFO(node_->get_logger(),"Ready-to-use path successfully assigned for current target");
       for(size_t i = 0; i < global_path.poses.size(); i++)
       {
-        global_path.poses[i].header.stamp = rclcpp::Clock{}.now();
+        // global_path.poses[i].header.stamp = rclcpp::Clock{}.now();
         // no sequence in ros2 in header
         // global_path[i].header.seq = i;
         global_path.poses[i].header.frame_id = current_costmap->getGlobalFrameID();
@@ -363,7 +363,7 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
     {
       state_point* p = (*i);
       //pose.header.frame_id = current_costmap->getGlobalFrameID();
-      pose.header.stamp = rclcpp::Clock{}.now();
+      // pose.header.stamp = rclcpp::Clock{}.now();
       // no sequence in ros2 in header
       // pose.header.seq = i;
       costmap->mapToWorld(p->x, p->y, pose.pose.position.x, pose.pose.position.y);
