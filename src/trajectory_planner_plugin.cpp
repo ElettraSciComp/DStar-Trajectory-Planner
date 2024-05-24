@@ -467,7 +467,5 @@ return global_path;
 
 }
 
-// https://navigation.ros.org/plugin_tutorials/docs/writing_new_nav2planner_plugin.html
 #include "pluginlib/class_list_macros.hpp"
-// PLUGINLIB_EXPORT_CLASS(dstar_global_planner::DStarGlobalPlanner, nav2_core::BaseGlobalPlanner);
 PLUGINLIB_EXPORT_CLASS(dstar_global_planner::DStarGlobalPlanner, nav2_core::GlobalPlanner);

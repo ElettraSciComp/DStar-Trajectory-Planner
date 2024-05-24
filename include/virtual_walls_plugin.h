@@ -1,7 +1,7 @@
 #ifndef VIRTUAL_WALLS_PLUGIN_H
 #define VIRTUAL_WALLS_PLUGIN_H
 
-#include "rclcpp/rclcpp.hpp"
+#include <rclcpp/rclcpp.hpp>
 #include <nav2_costmap_2d/costmap_2d_ros.hpp>
 #include <nav2_costmap_2d/costmap_2d.hpp>
 #include <nav2_costmap_2d/layer.hpp>
@@ -21,29 +21,33 @@
 
 #include <jsoncpp/json/json.h>
 
+#include "geometry_msgs/msg/polygon.hpp"
+
 namespace costmap_virtual_walls
 {
 
-using costmap_2d::NO_INFORMATION;
-using costmap_2d::LETHAL_OBSTACLE;
-using costmap_2d::FREE_SPACE;
+using nav2_costmap_2d::NO_INFORMATION;
+using nav2_costmap_2d::LETHAL_OBSTACLE;
+using nav2_costmap_2d::FREE_SPACE;
 
-class CostmapVirtualWalls : public costmap_2d::StaticLayer
+class CostmapVirtualWalls : public nav2_costmap_2d::StaticLayer
 {
 private:
-    ros::NodeHandle node;
+    rclcpp::Node::SharedPtr node;
 
     std::string walls_topic_name;
-    ros::Subscriber walls_subscriber;
-    void wall_polygon_callback(const geometry_msgs::PolygonConstPtr msg);
+    // ros::Subscriber walls_subscriber;
+    rclcpp::Subscription<geometry_msgs::msg::Polygon>::SharedPtr walls_subscriber;
+
+    void wall_polygon_callback(const std::shared_ptr<geometry_msgs::msg::Polygon> msg);
     bool subscribe_done;
     bool initialized;
     bool walls_available;
     bool paths_available;
 
     std::string global_frame_id;
-    std::vector<geometry_msgs::Polygon> walls;
-    std::vector< std::vector<geometry_msgs::Point32> > paths;
+    std::vector<geometry_msgs::msg::Polygon> walls;
+    std::vector< std::vector<geometry_msgs::msg::Point32> > paths;
     int default_cost;
 
     double current_x;
@@ -60,7 +64,7 @@ public:
     CostmapVirtualWalls();
     virtual ~CostmapVirtualWalls();
     virtual void onInitialize();
-    virtual void updateCosts(costmap_2d::Costmap2D& master_grid,
+    virtual void updateCosts(nav2_costmap_2d::Costmap2D& master_grid,
                              int min_i,
                              int min_j,
                              int max_i,

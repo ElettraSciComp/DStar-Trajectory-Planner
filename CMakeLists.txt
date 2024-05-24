@@ -34,6 +34,7 @@ find_package( tf2_geometry_msgs REQUIRED )
 # find_package( move_base REQUIRED )
 
 find_package( jsoncpp REQUIRED )
+find_package( OpenCV REQUIRED )
 
 
 include_directories(
@@ -68,13 +69,27 @@ add_library(${library_name} SHARED
   src/trajectory_planner_plugin.cpp
 )
 
+add_library(costmap_virtual_walls SHARED src/virtual_walls_plugin.cpp)
+
+target_include_directories(costmap_virtual_walls PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include>)
+
+ament_target_dependencies(costmap_virtual_walls
+  ${dependencies}
+  OpenCV
+)
+
 target_compile_options(dstar PRIVATE -fPIC)
 target_compile_options(${library_name} PRIVATE -fPIC)
+# target_compile_options(costmap_virtual_walls PRIVATE -fPIC)
 # target_link_options()
 
 ament_export_libraries(dstar)
+ament_export_libraries(costmap_virtual_walls)
 target_compile_definitions(${library_name} PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 target_compile_definitions(dstar PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
+# target_compile_definitions(costmap_virtual_walls PUBLIC "PLUGINLIB__DISABLE_BOOST_FUNCTIONS")
 
 # target_link_libraries(dstar ${rclcpp_LIBRARIES})
 # target_include_directories(dstar PUBLIC
@@ -87,11 +102,22 @@ target_link_libraries(${library_name} dstar jsoncpp)
 ament_target_dependencies(${library_name}
   ${dependencies}
   # dstar
+  pluginlib
 )
 
+pluginlib_export_plugin_description_file(nav2_costmap_2d plugins.xml)
 pluginlib_export_plugin_description_file(nav2_core global_planner_plugin.xml)
 
-install(TARGETS ${library_name} dstar
+# install(
+#   TARGETS costmap_virtual_walls
+#   EXPORT export_${PROJECT_NAME}
+#   ARCHIVE DESTINATION lib
+#   LIBRARY DESTINATION lib
+#   RUNTIME DESTINATION bin
+# )
+
+
+install(TARGETS ${library_name} dstar costmap_virtual_walls
   ARCHIVE DESTINATION lib
   LIBRARY DESTINATION lib
   RUNTIME DESTINATION lib/${PROJECT_NAME}
@@ -101,11 +127,15 @@ install(DIRECTORY include/
   DESTINATION include/
 )
 
-install(DIRECTORY launch/
-  DESTINATION share/${PROJECT_NAME}/launch
-)
+# install(DIRECTORY launch/
+#   DESTINATION share/${PROJECT_NAME}/launch
+# )
 
 install(FILES global_planner_plugin.xml
+  DESTINATION share/${PROJECT_NAME}
+)
+
+install(FILES plugins.xml
   DESTINATION share/${PROJECT_NAME}
 )
 
@@ -122,6 +152,9 @@ endif()
 
 
 ament_export_include_directories(include)
-ament_export_libraries(${library_name} dstar)
+ament_export_libraries(${library_name} dstar costmap_virtual_walls)
+# ament_export_targets(
+#   export_${PROJECT_NAME}
+# )
 ament_export_dependencies(${dependencies} dstar)
 ament_package()

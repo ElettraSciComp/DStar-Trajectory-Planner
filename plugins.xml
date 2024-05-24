@@ -1,0 +1,5 @@
+<library path="costmap_virtual_walls">
+    <class type="costmap_virtual_walls::CostmapVirtualWalls" base_class_type="nav2_costmap_2d::Layer">
+        <description>costmap_virtual_walls::CostmapVirtualWalls.</description>
+    </class>
+</library>

@@ -1,7 +1,7 @@
 #ifndef DSTAR_GLOBAL_PLANNER_PLUGIN_H
 #define DSTAR_GLOBAL_PLANNER_PLUGIN_H
 
-#include "rclcpp/rclcpp.hpp"
+#include <rclcpp/rclcpp.hpp>
 #include <nav2_costmap_2d/costmap_2d_ros.hpp>
 #include <nav2_costmap_2d/costmap_2d.hpp>
 #include <nav2_core/global_planner.hpp>
