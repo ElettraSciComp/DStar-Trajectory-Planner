@@ -122,7 +122,8 @@ public:
     // nav_msgs::msg::Path createPlan();
     nav_msgs::msg::Path createPlan(
         const geometry_msgs::msg::PoseStamped & start,
-        const geometry_msgs::msg::PoseStamped & goal
+        const geometry_msgs::msg::PoseStamped & goal,
+        std::function<bool()> cancel_checker
     ) override;
     // Method is called when planner server demands a global plan for specified start and goal pose. 
     // This method returns nav_msgs::msg::Path carrying global plan. 

@@ -201,7 +201,8 @@ void DStarGlobalPlanner::deactivate(){
 
 nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
     const geometry_msgs::msg::PoseStamped & start,
-    const geometry_msgs::msg::PoseStamped & goal
+    const geometry_msgs::msg::PoseStamped & goal,
+    std::function<bool()> /*cancel_checker*/
 ){
     nav_msgs::msg::Path global_path;
 
@@ -297,9 +298,9 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
     else
         RCLCPP_INFO(node_->get_logger(),"Existing path not found, running D* global planner");
   }
-  tf2::Quaternion current_orientation, destination_orientation;
+  tf2::Quaternion current_orientation;
+  tf2::Quaternion destination_orientation = tf2::Quaternion::getIdentity();
   int origin_x, origin_y, destination_x, destination_y;
-  int c = 0;
   double goal_distance;
   geometry_msgs::msg::PoseStamped pose;
   if(initial_path)
@@ -350,7 +351,7 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
       trajectory.clear();
       trajectory = generator->generate_trajectory();
     }
-    catch(dstar_exception)
+    catch(dstar_exception const&) //catch(dstar_exception)
     {
       RCLCPP_WARN(node_->get_logger(),"Empty path generated, probably lost localization");
       global_path.poses.clear();
@@ -421,7 +422,7 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
       trajectory.clear();
       trajectory = generator->replan_trajectory(origin_x, origin_y, state_grid->point(origin_x, origin_y)->cost_actual);
     }
-    catch(dstar_exception)
+    catch(dstar_exception const&) //catch(dstar_exception)
     {
       RCLCPP_WARN(node_->get_logger(),"Empty path generated, probably wrong localization");
       global_path.poses.clear();

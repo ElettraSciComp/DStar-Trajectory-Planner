@@ -1,13 +1,18 @@
-cmake_minimum_required(VERSION 3.5)
+cmake_minimum_required(VERSION 3.22.1) #3.5
 project(dstar_global_planner)
 
 # Default to C99
-set(CMAKE_C_STANDARD 99)
+# set(CMAKE_C_STANDARD 99)
 
 
 # Default to C++14
-set(CMAKE_CXX_STANDARD 17)
-
+# set(CMAKE_CXX_STANDARD 17)
+if(NOT CMAKE_CXX_STANDARD)
+  set(CMAKE_CXX_STANDARD 17)
+endif()
+if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+  add_compile_options(-Wall -Wextra -Wpedantic)
+endif()
 
 
 # find dependencies
@@ -108,18 +113,9 @@ ament_target_dependencies(${library_name}
 pluginlib_export_plugin_description_file(nav2_costmap_2d plugins.xml)
 pluginlib_export_plugin_description_file(nav2_core global_planner_plugin.xml)
 
-# install(
-#   TARGETS costmap_virtual_walls
-#   EXPORT export_${PROJECT_NAME}
-#   ARCHIVE DESTINATION lib
-#   LIBRARY DESTINATION lib
-#   RUNTIME DESTINATION bin
-# )
-
-
 install(TARGETS ${library_name} dstar costmap_virtual_walls
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib#/${PROJECT_NAME} <--
+  LIBRARY DESTINATION lib#/${PROJECT_NAME} <--
   RUNTIME DESTINATION lib/${PROJECT_NAME}
 )
 
@@ -156,5 +152,7 @@ ament_export_libraries(${library_name} dstar costmap_virtual_walls)
 # ament_export_targets(
 #   export_${PROJECT_NAME}
 # )
+
+#indicates which ament packages this package depends on at runtime
 ament_export_dependencies(${dependencies} dstar)
 ament_package()
