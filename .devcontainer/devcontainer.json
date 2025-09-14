@@ -1,0 +1,38 @@
+{
+    "name": "ROS 2 dev Container",
+    "privileged": true,
+    "image": "osrf/ros:jazzy-desktop-full",
+    "remoteUser": "root",
+    "workspaceFolder": "/root/ff_ws/",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/root/ff_ws/,type=bind",
+    "customizations": {
+        "vscode": {
+            "extensions":[
+                "ms-vscode.cpptools",
+                "ms-vscode.cpptools-themes",
+                "twxs.cmake",
+                "donjayamanne.python-extension-pack",
+                "eamodio.gitlens",
+                "ms-iot.vscode-ros",
+                "ms-vscode.cpptools-extension-pack"
+            ]
+        }
+    },
+    "containerEnv": {
+        "DISPLAY": "unix:0",
+        "ROS_AUTOMATIC_DISCOVERY_RANGE": "LOCALHOST", //from jazzy doc is defined
+        "ROS_DOMAIN_ID": "42"
+    },
+    "runArgs": [
+        "--net=host",
+        "--pid=host",
+        "--ipc=host",
+        "-e", "DISPLAY=${env:DISPLAY}",
+        "--name=rmf_all_imagev1.2"
+    ],
+    "mounts": [
+       "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
+       "source=/dev/dri,target=/dev/dri,type=bind,consistency=cached"
+    ],
+    "postCreateCommand": "sudo rosdep update && sudo rosdep install --from-paths src --ignore-src -y && sudo chown -R $(whoami) /root/ff_ws/ && colcon build --symlink-install"
+}
