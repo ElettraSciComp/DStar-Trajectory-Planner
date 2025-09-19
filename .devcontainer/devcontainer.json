@@ -3,8 +3,8 @@
     "privileged": true,
     "image": "osrf/ros:jazzy-desktop-full",
     "remoteUser": "root",
-    "workspaceFolder": "/root/ff_ws/",
-    "workspaceMount": "source=${localWorkspaceFolder},target=/root/ff_ws/,type=bind",
+    "workspaceFolder": "/root/ros2_ws/",
+    "workspaceMount": "source=${localWorkspaceFolder},target=/root/ros2_ws/,type=bind",
     "customizations": {
         "vscode": {
             "extensions":[
@@ -28,11 +28,11 @@
         "--pid=host",
         "--ipc=host",
         "-e", "DISPLAY=${env:DISPLAY}",
-        "--name=rmf_all_imagev1.2"
+        "--name=DstarDevIma"
     ],
     "mounts": [
        "source=/tmp/.X11-unix,target=/tmp/.X11-unix,type=bind,consistency=cached",
        "source=/dev/dri,target=/dev/dri,type=bind,consistency=cached"
     ],
-    "postCreateCommand": "sudo rosdep update && sudo rosdep install --from-paths src --ignore-src -y && sudo chown -R $(whoami) /root/ff_ws/ && colcon build --symlink-install"
+    "postCreateCommand": "source /opt/ros/jazzy/setup.bash && apt update && rosdep update && rosdep install --from-paths . -y"
 }
