@@ -24,6 +24,5 @@ The plugin accepts the following parameters
 |`erosion/enable`|-|`false`|Applies an erosion algorithm to clean a noisy map|
 |`erosion/erosion_gap`|`OccupancyGrid` cells|2|Erosion gap|
 
-
 ## Development and Roadmap
 The plugin was developed within the Robotics and Remotization initiative held at Elettra Sincrotrone Trieste. It is a part of an innovative flexible control system for mobile robots that was presented by the group leaders in Tokyo during 16th [IFToMM](https://iftomm-world.org) [World Congress](https://wc2023.jc-iftomm.org/) 2023. The interested ones can find the published paper here: https://doi.org/10.1007/978-3-031-45770-8_29
