@@ -14,6 +14,66 @@ namespace dstar_global_planner
 
 using namespace libdstar;
 
+void DStarGlobalPlanner::updateMap(){
+    std::unique_lock<nav2_costmap_2d::Costmap2D::mutex_t> lock(*(costmap->getMutex()));
+
+    long new_width = static_cast<long>(costmap->getSizeInCellsX());
+    long new_height = static_cast<long>(costmap->getSizeInCellsY());
+
+
+  if (
+        (width != new_width) || 
+        (height != new_height)
+      ){
+          if(generator) delete generator;
+          if(state_grid) delete state_grid;
+          state_grid = new state_map(new_width, new_height);
+      }
+  unsigned char* map_data = costmap->getCharMap();
+  // costmap->saveMap("/home/jobot/costmap_test.png");
+  for(long i = 0; i < width; i++)
+    for(long j = 0; j < height; j++)
+    {
+      unsigned long pos = (j * width) + i;
+      state_grid->point(i, j)->weight_previous = map_data[pos];
+      state_grid->point(i, j)->weight = map_data[pos];
+      state_grid->point(i, j)->cost_previous = map_data[pos];
+      state_grid->point(i, j)->cost_actual = map_data[pos];
+      if(map_data[pos] >= occupancy_threshold){
+        state_grid->point(i, j)->tag = state_point::stObstacle;
+        if(erosion){
+          for(long u = -erosion_gap; u <= erosion_gap; u++)
+            for(long v = erosion_gap; v >= -erosion_gap; v--){
+              long x_index = i + u;
+              long y_index = j + v;
+              if((x_index >= 0) &&
+                (x_index < state_grid->get_width()) &&
+                (y_index >= 0) &&
+                (y_index < state_grid->get_height()) &&
+                !((u == 0) && (v == 0)))
+                  if(state_grid->point(x_index, y_index)->tag != state_point::stObstacle)
+                    state_grid->point(x_index, y_index)->tag = state_point::stObstacle;
+            }
+        }
+      }
+      else
+        state_grid->point(i, j)->tag = state_point::stNew;
+    }
+  RCLCPP_INFO(node_->get_logger(),"D* internal costmap filled, running algorithm");
+  lock.unlock();
+  if (
+        (width != new_width) || 
+        (height != new_height)
+      ){
+        width = new_width;
+        height = new_height;
+        generator = new dstar(state_grid);
+        generator->set_cutoff_distance(cutoff_distance);
+        generator->set_r_field(potential_field_radius);
+        generator->set_repulsion_gain(repulsion_gain);
+      }
+}
+
 void DStarGlobalPlanner::parse_paths_json(const std::string &filename)
 {
     if(!boost::filesystem::exists(filename))
@@ -128,62 +188,17 @@ void DStarGlobalPlanner::configure(
       }
     }
     current_costmap = costmap_ros;
-    
-    //tmp fix
-    // delete state_grid;
-    // delete generator;
 
 }
 void DStarGlobalPlanner::activate(){
   RCLCPP_INFO(node_->get_logger(), "Activating plugin %s of type NavfnPlanner", name_.c_str());
-  // generator = nullptr;
-  // state_grid = nullptr;
-  // initial_path = true;
   RCLCPP_WARN(node_->get_logger(),"getting costmap");
   costmap = current_costmap->getCostmap();
-  width = static_cast<long>(costmap->getSizeInCellsX());
-  height = static_cast<long>(costmap->getSizeInCellsY());
+  //set to 0 so in the function updateMap() should be called the initialization 
+  width = 0;
+  height = 0;
+  updateMap();
   RCLCPP_INFO(node_->get_logger(),"Obtained map [%li, %li], %f m/pt, filling D* internal costmap...", width, height, costmap->getResolution());
-  if(generator)
-      delete generator;
-  if(state_grid)
-      delete state_grid;
-  state_grid = new state_map(width, height);
-  unsigned char* map_data = costmap->getCharMap();
-  // costmap->saveMap("/home/jobot/costmap_test.png");
-  for(long i = 0; i < width; i++)
-    for(long j = 0; j < height; j++)
-    {
-      unsigned long pos = (j * width) + i;
-      state_grid->point(i, j)->weight_previous = map_data[pos];
-      state_grid->point(i, j)->weight = map_data[pos];
-      state_grid->point(i, j)->cost_previous = map_data[pos];
-      state_grid->point(i, j)->cost_actual = map_data[pos];
-      if(map_data[pos] >= occupancy_threshold){
-        state_grid->point(i, j)->tag = state_point::stObstacle;
-        if(erosion){
-          for(long u = -erosion_gap; u <= erosion_gap; u++)
-            for(long v = erosion_gap; v >= -erosion_gap; v--){
-              long x_index = i + u;
-              long y_index = j + v;
-              if((x_index >= 0) &&
-                (x_index < state_grid->get_width()) &&
-                (y_index >= 0) &&
-                (y_index < state_grid->get_height()) &&
-                !((u == 0) && (v == 0)))
-                  if(state_grid->point(x_index, y_index)->tag != state_point::stObstacle)
-                    state_grid->point(x_index, y_index)->tag = state_point::stObstacle;
-            }
-        }
-      }
-      else
-        state_grid->point(i, j)->tag = state_point::stNew;
-    }
-  RCLCPP_INFO(node_->get_logger(),"D* internal costmap filled, running algorithm");
-  generator = new dstar(state_grid);
-  generator->set_cutoff_distance(cutoff_distance);
-  generator->set_r_field(potential_field_radius);
-  generator->set_repulsion_gain(repulsion_gain);
     
 }
 
@@ -208,6 +223,7 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
 
 //////////////////////////////////////////////////////
 
+  updateMap();
 
   // std::vector<geometry_msgs::msg::PoseStamped> plan;
   global_path.header.stamp = node_->now();
@@ -350,6 +366,7 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
       generator->init_targets(origin_x, origin_y, destination_x, destination_y);
       trajectory.clear();
       trajectory = generator->generate_trajectory();
+      std::cout<<"------------1time?---------------------"<<std::endl;
     }
     catch(dstar_exception const&) //catch(dstar_exception)
     {
@@ -404,7 +421,6 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
       initial_path = true;
       global_path.poses.clear();
       return global_path;
-      // return false;
     }
     current_origin = start;
     tf2::fromMsg(start.pose.orientation, current_orientation);
@@ -419,15 +435,20 @@ nav_msgs::msg::Path DStarGlobalPlanner::createPlan(
     RCLCPP_INFO(node_->get_logger(),"Replanning trajectory (%i, %i) <%u> --> (%i, %i) <%u>", origin_x, origin_y, costmap->getCost(origin_x, origin_y), destination_x, destination_y, costmap->getCost(destination_x, destination_y));
     try
     {
+      //why? I reach this point and didnt calculate the correct trajectory
+      generator->init_targets(origin_x, origin_y, destination_x, destination_y);
       trajectory.clear();
-      trajectory = generator->replan_trajectory(origin_x, origin_y, state_grid->point(origin_x, origin_y)->cost_actual);
+      trajectory = generator->generate_trajectory();
+      
+      std::cout<<"------------here---------------------"<<std::endl;
+      // trajectory.clear();
+      // trajectory = generator->replan_trajectory(origin_x, origin_y, state_grid->point(origin_x, origin_y)->cost_actual);
     }
     catch(dstar_exception const&) //catch(dstar_exception)
     {
       RCLCPP_WARN(node_->get_logger(),"Empty path generated, probably wrong localization");
       global_path.poses.clear();
       return global_path;
-      // return false;
     }
     for(auto i = trajectory.begin(); i != trajectory.end(); i++)
     {

@@ -133,6 +133,7 @@ public:
 
     double interpolation_resolution_;
 
+    void updateMap();
 
 };
 
